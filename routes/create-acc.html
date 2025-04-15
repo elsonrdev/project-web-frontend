@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - Tech Academy</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.svg" alt="Tech Academy Logo">
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1>Criar Conta</h1>
+            <p>VAMOS JUNTOS CONQUISTAR SEU FUTURO</p>
+            
+            <form class="auth-form">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" placeholder="Nome completo" required>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" placeholder="Email" required>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" placeholder="Telefone" required>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Senha" required>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="Confirmar senha" required>
+                </div>
+
+                <div class="form-options">
+                    <label class="terms">
+                        <input type="checkbox" required>
+                        <span>Eu aceito os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn">Criar conta</button>
+            </form>
+
+            <div class="auth-separator">
+                <span>ou</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i>
+                    Continuar com Google
+                </button>
+                <button class="social-btn github">
+                    <i class="fab fa-github"></i>
+                    Continuar com GitHub
+                </button>
+            </div>
+
+            <p class="auth-redirect">
+                Já tem uma conta? <a href="login.html">Fazer login</a>
+            </p>
+        </div>
+    </main>
+
+    <footer class="auth-footer">
+        <p>&copy; 2024 Tech Academy. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html> 
