@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Tech Academy</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-title {
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .admin-actions {
+            margin-bottom: 2rem;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .users-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .users-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Tech Academy</div>
+            <div class="nav-links">
+                <a href="/">Voltar para Home</a>
+            </div>
+            <div class="auth-buttons">
+                <button onclick="handleLogout()" class="btn-primary">Sair</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <h1 class="admin-title">Painel Administrativo</h1>
+        
+        <div class="admin-actions">
+            <button onclick="showCreateUserModal()" class="btn-primary">Novo Usuário</button>
+        </div>
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Função</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <!-- Usuários serão carregados aqui -->
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Modal de Criação de Usuário -->
+    <div id="createUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateUserModal()">&times;</span>
+            <h2>Novo Usuário</h2>
+            <form id="createUserForm" onsubmit="handleCreateUser(event)">
+                <div class="form-group">
+                    <label for="createName">Nome:</label>
+                    <input type="text" id="createName" required>
+                </div>
+                <div class="form-group">
+                    <label for="createEmail">Email:</label>
+                    <input type="email" id="createEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="createPhone">Telefone:</label>
+                    <input type="tel" id="createPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="createPassword">Senha:</label>
+                    <input type="password" id="createPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="createRole">Função:</label>
+                    <select id="createRole" required>
+                        <option value="user">Usuário</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Criar Usuário</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Usuário -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditUserModal()">&times;</span>
+            <h2>Editar Usuário</h2>
+            <form id="editUserForm" onsubmit="handleEditUser(event)">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUserName">Nome:</label>
+                    <input type="text" id="editUserName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmail">Email:</label>
+                    <input type="email" id="editUserEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserPhone">Telefone:</label>
+                    <input type="tel" id="editUserPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserRole">Função:</label>
+                    <select id="editUserRole" required>
+                        <option value="user">Usuário</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Funções de gerenciamento de usuário
+        const userManager = {
+            async getAllUsers() {
+                const response = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                return response.json();
+            },
+
+            async getUserById(id) {
+                const response = await fetch(`/api/admin/users/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                return response.json();
+            },
+
+            async createUser(userData) {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+                return response.json();
+            },
+
+            async updateUser(id, userData) {
+                const response = await fetch(`/api/admin/users/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+                return response.json();
+            },
+
+            async deleteUser(id) {
+                const response = await fetch(`/api/admin/users/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                return response.json();
+            }
+        };
+
+        // Funções de interface do usuário
+        function showCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'block';
+        }
+
+        function closeCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'none';
+        }
+
+        function showEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'block';
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+        }
+
+        // Funções de manipulação de eventos
+        async function loadUsers() {
+            try {
+                const users = await userManager.getAllUsers();
+                const tableBody = document.getElementById('usersTableBody');
+                tableBody.innerHTML = '';
+
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.role === 'admin' ? 'Administrador' : 'Usuário'}</td>
+                        <td class="action-buttons">
+                            <button onclick="handleEditUserClick('${user._id}')" class="btn-edit">Editar</button>
+                            <button onclick="handleDeleteUser('${user._id}')" class="btn-delete">Excluir</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                alert('Erro ao carregar usuários');
+            }
+        }
+
+        async function handleCreateUser(event) {
+            event.preventDefault();
+            const userData = {
+                name: document.getElementById('createName').value,
+                email: document.getElementById('createEmail').value,
+                phone: document.getElementById('createPhone').value,
+                password: document.getElementById('createPassword').value,
+                role: document.getElementById('createRole').value
+            };
+
+            try {
+                const response = await userManager.createUser(userData);
+                if (response._id) {
+                    closeCreateUserModal();
+                    loadUsers();
+                    alert('Usuário criado com sucesso!');
+                } else {
+                    alert(response.message || 'Erro ao criar usuário');
+                }
+            } catch (error) {
+                alert('Erro ao criar usuário. Tente novamente.');
+            }
+        }
+
+        async function handleEditUserClick(userId) {
+            try {
+                const user = await userManager.getUserById(userId);
+                if (user._id) {
+                    document.getElementById('editUserId').value = user._id;
+                    document.getElementById('editUserName').value = user.name;
+                    document.getElementById('editUserEmail').value = user.email;
+                    document.getElementById('editUserPhone').value = user.phone;
+                    document.getElementById('editUserRole').value = user.role;
+                    showEditUserModal();
+                }
+            } catch (error) {
+                alert('Erro ao carregar dados do usuário');
+            }
+        }
+
+        async function handleEditUser(event) {
+            event.preventDefault();
+            const userId = document.getElementById('editUserId').value;
+            const userData = {
+                name: document.getElementById('editUserName').value,
+                email: document.getElementById('editUserEmail').value,
+                phone: document.getElementById('editUserPhone').value,
+                role: document.getElementById('editUserRole').value
+            };
+
+            try {
+                const response = await userManager.updateUser(userId, userData);
+                if (response._id) {
+                    closeEditUserModal();
+                    loadUsers();
+                    alert('Usuário atualizado com sucesso!');
+                } else {
+                    alert(response.message || 'Erro ao atualizar usuário');
+                }
+            } catch (error) {
+                alert('Erro ao atualizar usuário. Tente novamente.');
+            }
+        }
+
+        async function handleDeleteUser(userId) {
+            if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                try {
+                    const response = await userManager.deleteUser(userId);
+                    if (response.message) {
+                        loadUsers();
+                        alert('Usuário excluído com sucesso!');
+                    } else {
+                        alert(response.message || 'Erro ao excluir usuário');
+                    }
+                } catch (error) {
+                    alert('Erro ao excluir usuário. Tente novamente.');
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            window.location.href = '/';
+        }
+
+        // Verificação de autenticação e função de administrador
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (!token || !currentUser || currentUser.role !== 'admin') {
+                window.location.href = '/';
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadUsers();
+        });
+    </script>
+</body>
+</html> 
