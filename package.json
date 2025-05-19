@@ -1,7 +1,7 @@
 {
   "name": "tech-academy",
   "version": "1.0.0",
-  "description": "Plataforma de ensino online com MongoDB Atlas",
+  "description": "Plataforma de cursos online",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,9 +15,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.3",
-    "validator": "^13.9.0"
+    "mysql2": "^3.2.0",
+    "sequelize": "^6.31.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
